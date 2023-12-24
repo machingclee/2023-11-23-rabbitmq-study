@@ -1,5 +1,5 @@
 import amqplib from "amqplib";
-
+const EXCHANGE_NAME = "task_RPC";
 const RPC_QUEUE_NAME = "rpc_queue";
 
 function fibonacci(n: number): number {
@@ -15,7 +15,9 @@ const NUM_OF_CONCURRENT_TASK = 100;
 const processTask = async () => {
     const connection = await amqplib.connect("amqp://localhost");
     const channel = await connection.createChannel();
+    await channel.assertExchange(EXCHANGE_NAME, "direct", { durable: true });
     await channel.assertQueue(RPC_QUEUE_NAME, { durable: false });
+    channel.bindQueue(RPC_QUEUE_NAME, EXCHANGE_NAME, "llm")
     channel.prefetch(NUM_OF_CONCURRENT_TASK);
     channel.consume(
         RPC_QUEUE_NAME,
@@ -23,9 +25,8 @@ const processTask = async () => {
             if (!msg) {
                 return;
             }
-            const n = parseInt(msg?.content?.toString() || "0");
-            console.log(`Start to calculate fibonacci[${n}]`)
-            const fibNum = fibonacci(n);
+            const message = msg?.content?.toString() || "";
+            // do something...
             channel.sendToQueue(
                 msg?.properties.replyTo,
                 Buffer.from(fibNum.toString()),
