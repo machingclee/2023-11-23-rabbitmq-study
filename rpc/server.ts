@@ -29,7 +29,7 @@ const processTask = async () => {
             // do something...
             channel.sendToQueue(
                 msg?.properties.replyTo,
-                Buffer.from(fibNum.toString()),
+                Buffer.from("some response"),
                 { correlationId: msg?.properties.correlationId }
             );
             channel.ack(msg);
