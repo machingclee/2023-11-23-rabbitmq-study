@@ -22,7 +22,7 @@ export const requestTask = async () => {
         channel.publish(
             EXCHANGE_NAME,
             "llm",
-            Buffer.from(randomSmallNumber.toString()),
+            Buffer.from(msg),
             {
                 replyTo: q.queue,
                 correlationId: uuid,
